@@ -1,6 +1,6 @@
 # Telegram Systemd Notifier
 
-Simple, lightweight, zero-dependency Go application that sends Telegram notifications when systemd services succeed or fail, providing real-time monitoring of Linux systems.
+Simple, lightweight, zero-dependency Go application that sends Telegram notification messages when systemd services succeed or fail, providing real-time monitoring of Linux systems.
 
 ---
 <br>
@@ -16,13 +16,13 @@ Simple, lightweight, zero-dependency Go application that sends Telegram notifica
 - **SELinux Compatible**: Proper security context handling for system services
 - **Minimal Resource Usage**: Efficient execution with configurable timeouts and rate limits
 
-**What Gets Monitored**
+**Sends Notifications When**
 - Systemd execution errors (file not found, permission denied, invalid arguments)
 - Minor unit file configuration errors (invalid size/boolean values)
 - Service success/failure status with detailed exit codes
 - Command output and systemd lifecycle events
 
-**What Does Not Get Monitored**
+**Doesn't Send Notifications When**
 - Syntax errors in systemd unit files (missing headers, invalid sections)
 
 ---
@@ -121,7 +121,7 @@ curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/sendMessage" \
 **Option 1: Download Pre-built Binary**
 ```bash
 # Download latest release
-wget https://raw.githubusercontent.com/Git-User76/telegram-notifier/telegram-notifier
+wget https://raw.githubusercontent.com/Git-User76/Telegram-Notifier/blob/main/telegram-notifier
 
 # Make executable
 chmod 700 telegram-notifier
@@ -133,7 +133,7 @@ mv telegram-notifier ~/.local/bin/
 **Option 2: Build from Source**
 ```shell
 # Clone repository
-git clone https://github.com/yourusername/telegram-notifier.git
+git clone https://github.com/Git-User76/Telegram-Notifier.git
 cd telegram-notifier
 
 # Build to binary "telegram-notifier"
@@ -178,7 +178,7 @@ sudo restorecon -v /path/to/telegram-notifier
 
 ### Set Environment Variables
 
-Create environment configuration file with your Telegram credentials.
+Create systemd environment configuration file.
 
 **For User Services**
 ```shell
@@ -249,7 +249,7 @@ chmod 600 ~/.config/environment.d/telegram-notifier.conf
 <br>
 
 ### Create Notification Handler Service
-Create the Telegram notification handler service template that will be referenced by your actual services.
+Create the Telegram notification handler service that will be referenced by your actual services to send Telegram notifications.
 
 **For User Services**
 ```shell
@@ -380,7 +380,7 @@ systemctl --user list-timers backup.timer
 <br>
 
 ### Notification Behavior
-- Service succeeds: ExecStartPost= sends success notification
-- Service fails: OnFailure= sends failure notification
+- Service succeeds: `ExecStartPost=` sends success notification
+- Service fails: `OnFailure=` sends failure notification
 - Timer triggers service: Appropriate notification sent based on result
 - Missed timer execution: If Persistent=true, runs on next boot and sends notification
