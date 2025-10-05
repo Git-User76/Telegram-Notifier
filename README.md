@@ -37,11 +37,13 @@ Simple, lightweight, zero-dependency Go application that sends Telegram notifica
 ---
 <br>
 
-## 📁 Configuration Files
+## 📁 Required Files
 
 The application uses systemd's native environment configuration:
 
 ### Systemd Environment Variable File
+File used for main configuration.
+
 ```shell
 # For User Services
 ~/.config/environment.d/telegram-notifier.conf
@@ -56,8 +58,8 @@ The application uses systemd's native environment configuration:
 
 |Variable|Purpose|Default|Example|
 |---|---|---|---|
-|`TELEGRAM_BOT_TOKEN`|Bot token from @BotFather|_Required_|`1234567890:ABC...`|
-|`TELEGRAM_CHAT_ID`|Target chat/channel ID|_Required_|`-1001234567890`|
+|`TELEGRAM_BOT_TOKEN`|Bot token from @BotFather|**Required**|`1234567890:ABC...`|
+|`TELEGRAM_CHAT_ID`|Target chat/channel ID|**Required**|`-1001234567890`|
 |`NOTIFIER_HOSTNAME_ALIAS`|Custom hostname for privacy|Actual hostname|`my-server`|
 |`TZ`|Timezone for timestamps|System timezone|`America/New_York`, `UTC`|
 |`NOTIFIER_COMMAND_TIMEOUT`|Command execution timeout|`30s`|`45s`, `1m`, `2m30s`|
@@ -79,46 +81,9 @@ The application uses systemd's native environment configuration:
 ---
 <br>
 
-## 🔧 Installation
+## 🔧 Install Binary
 
-### Step 1: Get Telegram Credentials
-
-**Create a Telegram Bot**
-1. Open Telegram and search for `@BotFather`
-2. Start conversation with `@BotFather`
-3. Send `/newbot` command
-4. Choose a display name (e.g., "System Monitor")
-5. Choose a username ending with 'bot' (e.g., `system_monitor_bot`)
-6. Save the bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)
-
-**Get Chat ID**
-1. Create a Telegram channel or use existing one
-2. Add your bot as an admin to the channel
-3. Send at least one message to the channel
-4. Retrieve chat ID using Telegram API:
-
-```shell
-# Syntax
-curl "https://api.telegram.org/bot<BOT_TOKEN>/getUpdates"
-
-# Example
-curl "https://api.telegram.org/bot1234567890:ABCdefGHIjklMNOpqrsTUVwxyz/getUpdates"
-```
-
-Look for the `"chat":{"id":-1001234567890}` field in the response.
-
-**Test Connection**
-```shell
-curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/sendMessage" \
-     -d "chat_id=<CHAT_ID>" \
-     -d "text=Test message from Linux system"
-```
-
-<br>
-
-### Step 2: Install Binary
-
-**Option 1: Download Pre-built Binary**
+**Option 1: Download Pre-built Binary (Recommended)**
 ```bash
 # Download latest release
 wget https://raw.githubusercontent.com/Git-User76/Telegram-Notifier/blob/main/telegram-notifier
@@ -128,6 +93,10 @@ chmod 700 telegram-notifier
 
 # Move binary to user PATH
 mv telegram-notifier ~/.local/bin/
+
+# Move to system PATH for system-wide use
+# sudo cp telegram-notifier /usr/local/bin/
+# sudo chmod 755 /usr/local/bin/telegram-notifier
 ```
 
 **Option 2: Build from Source**
@@ -144,13 +113,10 @@ chmod 700 telegram-notifier
 
 # Move binary to user PATH
 mv telegram-notifier ~/.local/bin/
-```
 
-**For System-Wide Use**
-```shell
-# Move to system PATH
-sudo cp telegram-notifier /usr/local/bin/
-sudo chmod 755 /usr/local/bin/telegram-notifier
+# Move to system PATH for system-wide use
+# sudo cp telegram-notifier /usr/local/bin/
+# sudo chmod 755 /usr/local/bin/telegram-notifier
 ```
 
 <br>
@@ -175,6 +141,41 @@ sudo restorecon -v /path/to/telegram-notifier
 <br>
 
 ## ⚙️ Configuration
+
+### Get Telegram Credentials
+
+**Create a Telegram Bot**
+1. Open Telegram and search for `@BotFather`
+2. Start conversation with `@BotFather`
+3. Send `/newbot` command
+4. Choose a display name (e.g., "System Monitor")
+5. Choose a username ending with 'bot' (e.g., `system_monitor_bot`)
+6. **Save the bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)**
+
+**Get Chat ID**
+1. Create a Telegram channel or use existing one
+2. Add your bot as an admin to the channel
+3. Send at least one message to the channel
+4. **Save the chat ID using Telegram API:**
+
+```shell
+# Syntax
+curl "https://api.telegram.org/bot<BOT_TOKEN>/getUpdates"
+
+# Example
+curl "https://api.telegram.org/bot1234567890:ABCdefGHIjklMNOpqrsTUVwxyz/getUpdates"
+```
+
+Look for the `"chat":{"id":-1001234567890}` field in the response.
+
+**Test Connection**
+```shell
+curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/sendMessage" \
+     -d "chat_id=<CHAT_ID>" \
+     -d "text=Test message from Linux system"
+```
+
+<br>
 
 ### Set Environment Variables
 
@@ -236,16 +237,6 @@ EOF
 sudo systemctl daemon-reload
 ```
 
-**Verify File Permissions**
-```shell
-# Check credential file permissions
-ls -la ~/.config/environment.d/telegram-notifier.conf
-# Should show: -rw------- (600)
-
-# Fix if needed
-chmod 600 ~/.config/environment.d/telegram-notifier.conf
-```
-
 <br>
 
 ### Create Notification Handler Service
@@ -294,7 +285,7 @@ sudo systemctl daemon-reload
 
 ### Integrating with Existing Systemd Services
 
-Add notification triggers to any systemd service by including `OnFailure=` for failures and `ExecStartPost=` for successes.
+Add Telegram notification triggers to any systemd service by including `OnFailure=` for failures and `ExecStartPost=` for successes.
 
 <br>
 
@@ -307,21 +298,19 @@ Add notification triggers to any systemd service by including `OnFailure=` for f
 Description=Update user Flatpak apps
 Wants=network-online.target
 After=network-online.target
+
+# Automatically send Telegram notification if service fails (notifier service)
 OnFailure=telegram-notify@%n.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/flatpak update --noninteractive -y
+
+# Automatically send Telegram notification on service success (binary location)
 ExecStartPost=%h/.local/bin/telegram-notifier %n
 
 [Install]
 WantedBy=default.target
-```
-
-```shell
-# Reload and enable the service
-systemctl --user daemon-reload
-systemctl --user enable --now flatpak-update.service
 ```
 
 <br>
@@ -365,16 +354,6 @@ RandomizedDelaySec=15min
 
 [Install]
 WantedBy=timers.target
-```
-
-**Implement Changes**
-```shell
-# Reload and enable the timer (not the service)
-systemctl --user daemon-reload
-systemctl --user enable --now backup.timer
-
-# Check timer status
-systemctl --user list-timers backup.timer
 ```
 
 <br>
