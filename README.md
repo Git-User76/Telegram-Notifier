@@ -70,6 +70,8 @@ File used for main configuration.
 
 ### Systemd Notification Handler Service
 
+Required for receiving notifications if the service using it fails.
+
 ```shell
 # For User Services
 ~/.config/systemd/user/telegram-notify@.service
@@ -362,4 +364,10 @@ WantedBy=timers.target
 - Service succeeds: `ExecStartPost=` sends success notification
 - Service fails: `OnFailure=` sends failure notification
 - Timer triggers service: Appropriate notification sent based on result
-- Missed timer execution: If Persistent=true, runs on next boot and sends notification
+- Missed timer execution: If `Persistent=true`, runs on next boot and sends notification
+
+---
+<br>
+
+## Example Telegram Notification Message
+![telegram-message](telegram-message.png)
