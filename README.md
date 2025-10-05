@@ -88,7 +88,7 @@ Required for receiving notifications if the service using it fails.
 **Option 1: Download Pre-built Binary (Recommended)**
 ```bash
 # Download latest release
-wget https://raw.githubusercontent.com/Git-User76/Telegram-Notifier/blob/main/telegram-notifier
+wget https://raw.githubusercontent.com/Git-User76/Telegram-Notifier/main/telegram-notifier
 
 # Make executable
 chmod 700 telegram-notifier
