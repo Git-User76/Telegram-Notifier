@@ -1,0 +1,18 @@
+# User Service: ~/.config/systemd/user/backup.service
+# System Service: /etc/systemd/system/backup.service
+
+[Unit]
+Description=Daily Backup Service
+Wants=network-online.target
+After=network-online.target
+
+# Automatically send Telegram notification if service fails (notifier service)
+OnFailure=telegram-notify@%n.service
+
+[Service]
+Type=oneshot
+# Any command you want
+ExecStart=/home/user/scripts/backup.sh
+
+# Automatically send Telegram notification on service success (binary location)
+ExecStartPost=%h/.local/bin/telegram-notifier %n

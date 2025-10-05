@@ -1,0 +1,12 @@
+# Universal template service for sending Telegram notifications
+
+[Unit]
+Description=Send Telegram notification for service %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+
+# %i = service name that triggered this notification
+ExecStart=%h/.local/bin/telegram-notifier %i

@@ -1,0 +1,15 @@
+# User Timer: ~/.config/systemd/user/backup.timer
+# System Timer: /etc/systemd/system/backup.timer
+
+[Unit]
+Description=Daily Backup Timer
+Requires=backup.service
+
+[Timer]
+# Regular timer configuration
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+RandomizedDelaySec=15min
+
+[Install]
+WantedBy=timers.target
