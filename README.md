@@ -369,5 +369,5 @@ WantedBy=timers.target
 ---
 <br>
 
-## Example Telegram Notification Message
+## 💬 Example Telegram Notification Message
 ![telegram-message](telegram-message.png)
